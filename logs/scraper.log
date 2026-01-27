@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/alex/Projects/optcg-metabot/data/scraper.py", line 17, in <module>
+    time.sleep(1)
+    ~~~~~~~~~~^^^
+KeyboardInterrupt

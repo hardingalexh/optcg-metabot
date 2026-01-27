@@ -86,7 +86,7 @@ def find_leader(leader, leaders):
         return {}
 
 
-def main():
+def scrape():
     data = get_file()
     output = parse_matchups(data)
     output = sorted(output, key=lambda x: (x["leader"], x["opponent"]))
@@ -94,6 +94,3 @@ def main():
         c = csv.DictWriter(outfile, fieldnames=output[0].keys())
         c.writeheader()
         c.writerows(output)
-
-
-main()

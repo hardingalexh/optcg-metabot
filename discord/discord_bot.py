@@ -1,7 +1,12 @@
+import os
+from dotenv import load_dotenv
 import discord
 import parser
 import matchups as mu
 from discord.ext import commands
+
+# Load environment variables from .env file
+load_dotenv()
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -37,5 +42,10 @@ async def matchups(ctx):
     await command_func(ctx)
 
 
-# hardcoded during dev, token will be reset and made into env for deploy
-bot.run("MTQ2NTczOTExOTIxNTkwMzAwNg.GuNH1I.kqcSRS-ZT_XCNHwKKO5BViJbme8b2lL2x5vq10")
+# Load Discord token from environment
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+
+if not DISCORD_TOKEN:
+    raise ValueError("DISCORD_TOKEN not found in .env file")
+
+bot.run(DISCORD_TOKEN)

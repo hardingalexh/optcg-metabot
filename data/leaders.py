@@ -25,11 +25,8 @@ def fill_leaders(leaders):
     return out
 
 
-def main():
+def scrape():
     leaders = dedupe_leaders(fetch_leaders())
     leaders = fill_leaders(leaders)
     with open("leaders.json", "w") as jsonfile:
         json.dump(leaders, jsonfile)
-
-
-main()
