@@ -8,26 +8,41 @@ def load_matchup_data():
         return list(reader)
 
 
-def fetch_matchups(leaders: list[dict]) -> list[dict]:
+def fetch_matchups(leaders: list[dict], opponents: list[dict] = []) -> list[dict]:
     matchup_data = load_matchup_data()
     matchups = []
-    for leader in leaders:
-        for opponent in leaders:
-            if leader.get("card_id") == opponent.get("leader_id"):
-                continue
-            print(leader.get("card_id"), opponent.get("leader_id"))
-            matchup = next(
-                (
-                    m
-                    for m in matchup_data
-                    if m.get("leader_id") == leader.get("card_id")
-                    and m.get("opponent_id") == opponent.get("card_id")
-                ),
-                None,
-            )
-            if matchup:
-                matchups.append(matchup)
+    if len(opponents) == 0:
+        matchups = [
+            m
+            for m in matchup_data
+            if any(m.get("leader_id") == leader.get("card_id") for leader in leaders)
+        ]
+        matchups.sort(key=lambda x: int(x.get("total_games")), reverse=True)
+        matchups = matchups[0:9]
+    else:
+        for leader in leaders:
+            for opponent in opponents:
+                if leader.get("card_id") == opponent.get("leader_id"):
+                    continue
+                matchup = next(
+                    (
+                        m
+                        for m in matchup_data
+                        if m.get("leader_id") == leader.get("card_id")
+                        and m.get("opponent_id") == opponent.get("card_id")
+                    ),
+                    None,
+                )
+                if matchup:
+                    matchups.append(matchup)
     return matchups
+
+
+def round_float(value: str) -> float:
+    try:
+        return round(float(value), 2)
+    except (ValueError, TypeError):
+        return 0.0
 
 
 def format_matchup_response(matchups: list[dict]) -> str:
@@ -43,13 +58,13 @@ def format_matchup_response(matchups: list[dict]) -> str:
                 "inline": True,
             },
             {
-                "name": "First Win %",
-                "value": f"{round(matchup.get('first_w_pct'), 2)}% ({matchup.get('first_total_games')} Games)",
+                "name": "Going First Win %",
+                "value": f"{round_float(matchup.get('first_w_pct'))}% ({matchup.get('first_total_games')} Games)",
                 "inline": True,
             },
             {
-                "name": "Second Win %",
-                "value": f"{round(matchup.get('second_w_pct'), 2)}% ({matchup.get('second_total_games')} Games)",
+                "name": "Going Second Win %",
+                "value": f"{round_float(matchup.get('second_w_pct'))}% ({matchup.get('second_total_games')} Games)",
                 "inline": True,
             },
         ]

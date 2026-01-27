@@ -59,7 +59,6 @@ def as_set(token: str) -> str | bool:
 def parse_leader(leader):
     leaders = retrieve_leaders()
     leader_tokens = leader.split(" ")
-    print(leader_tokens)
     for token in leader_tokens:
         if as_color(token):
             leaders = [

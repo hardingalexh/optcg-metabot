@@ -22,9 +22,6 @@ def get_file():
     contents = file.text
     data = base64.b64decode(contents)
     out = gzip.decompress(data)
-
-    with open("decoded.json", "wb") as f:
-        f.write(out)
     return json.loads(out)
 
 
@@ -54,7 +51,7 @@ def parse_matchups(data):
             subject_obj = find_leader(subject, leader_map)
 
             def format_name(obj):
-                return f"{obj.get('card_id')} {obj.get('name')}"
+                return f"{obj.get('set')} {obj.get('name')}"
 
             leader_name = format_name(leader_obj)
             subject_name = format_name(subject_obj)
@@ -82,7 +79,6 @@ def map_leaders():
 
 def find_leader(leader, leaders):
     leader = leader.replace("1x", "")
-    print(leader)
     try:
         leader_obj = next(lead for lead in leaders if lead.get("card_id") == leader)
         return leader_obj
