@@ -22,4 +22,4 @@ The Discord bot is located in the `/discord` directory.
 The `run.sh` bash script runs both the scraper and discord bot as background tasks with logging. To build and deploy the docker image:
 
 1. `docker build . -t buggy-bot`
-2. `docker run -d buggy-bot --restart always`
+2. `docker run -d --restart always buggy-bot`
