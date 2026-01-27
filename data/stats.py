@@ -50,16 +50,20 @@ def parse_matchups(data):
             if second_wins and second_losses:
                 second_win_percent = (second_wins / (second_wins + second_losses)) * 100
 
-            def format_name(leader_name):
-                leader_name = leader_name.replace("1x", "")
-                return f"{leader_name} {leader_map.get(leader_name, leader_name)}"
+            leader_obj = find_leader(leader["leader"], leader_map)
+            subject_obj = find_leader(subject, leader_map)
 
-            leader_name = format_name(leader["leader"])
-            subject_name = format_name(subject)
+            def format_name(obj):
+                return f"{obj.get('card_id')} {obj.get('name')}"
+
+            leader_name = format_name(leader_obj)
+            subject_name = format_name(subject_obj)
             output.append(
                 {
                     "leader": leader_name,
+                    "leader_id": leader_obj.get("card_id"),
                     "opponent": subject_name,
+                    "opponent_id": subject_obj.get("card_id"),
                     "total_games": first_total_games + second_total_games,
                     "first_w_pct": first_win_percent,
                     "first_total_games": first_total_games,
@@ -71,11 +75,19 @@ def parse_matchups(data):
 
 
 def map_leaders():
-    with open("leader_lookup.json", "r") as f:
+    with open("leaders.json", "r") as f:
         lookup = json.load(f)
-    flatmap = [[l["card_id"], l["name"]] for l in lookup if not l["variant"]]
-    dict_out = {item[0]: item[1] for item in flatmap}
-    return dict_out
+    return lookup
+
+
+def find_leader(leader, leaders):
+    leader = leader.replace("1x", "")
+    print(leader)
+    try:
+        leader_obj = next(lead for lead in leaders if lead.get("card_id") == leader)
+        return leader_obj
+    except Exception:
+        return {}
 
 
 def main():
