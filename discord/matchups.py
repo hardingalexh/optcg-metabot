@@ -2,14 +2,16 @@ import csv
 import discord
 
 
-def load_matchup_data():
-    with open("out.csv", "r") as csvfile:
+def load_matchup_data(prefix: str = "all") -> list[dict]:
+    with open(f"out_{prefix}.csv", "r") as csvfile:
         reader = csv.DictReader(csvfile)
         return list(reader)
 
 
-def fetch_matchups(leaders: list[dict], opponents: list[dict] = []) -> list[dict]:
-    matchup_data = load_matchup_data()
+def fetch_matchups(
+    leaders: list[dict], opponents: list[dict] = [], prefix: str = "all"
+) -> list[dict]:
+    matchup_data = load_matchup_data(prefix)
     matchups = []
     if len(opponents) == 0:
         matchups = [

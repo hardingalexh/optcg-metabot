@@ -15,9 +15,8 @@ import requests
 # ]
 
 
-def get_file():
+def get_file(url: str):
     # bas64encoded gzipped json file
-    url = "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_lw.json"
     file = requests.get(url)
     contents = file.text
     data = base64.b64decode(contents)
@@ -87,10 +86,22 @@ def find_leader(leader, leaders):
 
 
 def scrape():
-    data = get_file()
-    output = parse_matchups(data)
-    output = sorted(output, key=lambda x: (x["leader"], x["opponent"]))
-    with open("out.csv", "w") as outfile:
-        c = csv.DictWriter(outfile, fieldnames=output[0].keys())
-        c.writeheader()
-        c.writerows(output)
+    files = {
+        "all": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_lw.json",
+        "1b": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_LWW1BillionBounty.json",
+        "2b": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_LWW2BillionBounty.json",
+        "eastern": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_lw_eastern.json",
+    }
+
+    for key, url in files.items():
+        data = get_file(url)
+        output = parse_matchups(data)
+        output = sorted(output, key=lambda x: (x["leader"], x["opponent"]))
+        with open(f"out_{key}.csv", "w") as outfile:
+            c = csv.DictWriter(outfile, fieldnames=output[0].keys())
+            c.writeheader()
+            c.writerows(output)
+
+
+if __name__ == "__main__":
+    scrape()

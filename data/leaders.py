@@ -29,4 +29,8 @@ def scrape():
     leaders = dedupe_leaders(fetch_leaders())
     leaders = fill_leaders(leaders)
     with open("leaders.json", "w") as jsonfile:
-        json.dump(leaders, jsonfile)
+        json.dump(leaders, jsonfile, indent=2)
+
+
+if __name__ == "__main__":
+    scrape()
