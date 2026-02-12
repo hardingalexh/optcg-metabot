@@ -15,6 +15,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 
 async def command_func(ctx):
+    content = ctx.message.content.replace("!matchups", "").strip()
     content = ctx.message.content.replace("!matchup", "").strip()
     leaders = content.split(",")
     parsed_leaders = parser.parse_leader(leaders[0].strip())
