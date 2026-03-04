@@ -31,10 +31,16 @@ async def command_func(ctx):
     if len(leaders) > 1:
         matches = mu.fetch_matchups(parsed_leaders, parsed_opponents, prefix=prefix)
     response_embeds = mu.format_matchup_response(matches)
-    for embed in response_embeds:
-        await ctx.send(embed=embed)
+
     if not response_embeds:
         await ctx.send("No matchups found")
+    elif len(response_embeds) <= 10:
+        for embed in response_embeds:
+            await ctx.send(embed=embed)
+    else:
+        await ctx.send(
+            f"Found {len(response_embeds)} matchups. Please refine your search to get fewer results."
+        )
 
 
 @bot.command()
