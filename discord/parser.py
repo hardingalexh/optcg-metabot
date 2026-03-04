@@ -50,7 +50,7 @@ def as_set(token: str) -> str | bool:
             if number_part == "":
                 match = set_type.upper()
             elif number_part.isdigit():
-                match = f"{set_type.upper()}{int(number_part)}"
+                match = f"{set_type.upper()}{number_part}"
         if match:
             break
     return match
@@ -81,6 +81,8 @@ def test():
     patterns = [
         "PB Luffy",
         "UP Luffy",
+        "OP08 Pudding",
+        "OP-09 Buggy",
         "OP12 Zoro",
         "Zoro",
         "OP-13 Sabo",
@@ -94,3 +96,7 @@ def test():
         for leader in result:
             print(f"  - {leader['name']} ({leader['card_id']})")
         print()
+
+
+if __name__ == "__main__":
+    test()
