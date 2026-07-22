@@ -1,8 +1,8 @@
 import requests
 import matplotlib.pyplot as plt
+from datetime import datetime
 from PIL import Image
 from io import BytesIO
-import matplotlib.dates as mdates
 
 test_strings = ["09 Roger", "OP16 Galdino", "OP14 Nami", "OP-09 Luffy", "07 Foxy"]
 
@@ -56,7 +56,38 @@ def get_prices(card):
     return r.json()
 
 
-## card search format = OPXX-YYY
+def format_cents(value):
+    dollars = float(value) / 100.0
+    return f"${dollars:.2f}"
+
+
+def generate_card_visualization(card_image_url, card_prices):
+    timestamps = [
+        datetime.fromtimestamp(item[0] / 1000) or None for item in card_prices
+    ]
+    prices = [item[1] / 100.0 for item in card_prices]
+
+    fig = plt.figure(figsize=(12, 4), constrained_layout=True)
+    ax_image = fig.add_axes([0.0, 0.0, 1.0 / 3.0, 1.0])
+    ax_chart = fig.add_axes([1.0 / 3.0, 0.0, 2.0 / 3.0, 1.0])
+
+    image_response = requests.get(card_image_url)
+    image = Image.open(BytesIO(image_response.content)).convert("RGB")
+    ax_image.imshow(image)
+    ax_image.axis("off")
+
+    ax_chart.plot(timestamps, prices, color="tab:blue", marker="o", linewidth=2)
+    ax_chart.set_title("Price History")
+    ax_chart.set_xlabel("Date")
+    ax_chart.set_ylabel("Price ($)")
+    plt.setp(ax_chart.get_xticklabels(), rotation=45, ha="right")
+    ax_chart.grid(True, alpha=0.3)
+
+    output_path = "card_price_history.png"
+    fig.savefig(output_path, bbox_inches="tight", dpi=150)
+    plt.close(fig)
+    return output_path
+
 
 for param in test_strings:
     base_cards = get_card_numbers(param)
@@ -68,6 +99,5 @@ for param in test_strings:
         card_id = f"{card_id.replace('~', '_p').replace('_p0', '')}_EN"
         card_image_url = f"{img_url}/{set_str}/{card_id}.webp"
         card_prices = get_prices(limitless_ids[x])
-        print(card_prices)
         card_prices_tcgp = card_prices.get("tcgplayer")
-        print(card_image_url, len(card_prices))
+        generate_card_visualization(card_image_url, card_prices_tcgp)
