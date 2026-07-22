@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import discord
 import parser
 import matchups as mu
+from marketplace import get_images
 from discord.ext import commands
 import re
 
@@ -72,6 +73,18 @@ async def matchups(ctx):
 @bot.command()
 async def matchup(ctx):
     await command_func(ctx)
+
+
+@bot.command()
+async def market(ctx):
+    content = ctx.message.content.replace(f"!{ctx.invoked_with}", "").strip()
+    try:
+        images = get_images(content)
+        for file, embed in images:
+            await ctx.send(file=file, embed=embed)
+    except Exception as e:
+        print(e)
+        await ctx.send("No cards found. _Did you include a set number?_")
 
 
 # Load Discord token from environment
