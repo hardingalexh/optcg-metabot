@@ -18,7 +18,7 @@ def parse_set(set_str):
     if len(set_str) != 4:
         pass
         ## we should error here
-    return set_str
+    return set_str.capitalize()
 
 
 def get_card_numbers(param: str) -> list[str]:
