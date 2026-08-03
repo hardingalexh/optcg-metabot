@@ -30,7 +30,9 @@ def get_card_numbers(param: str) -> list[str]:
     Returns:
         list[str]: _description_
     """
-    set_str, card_name = param.split(" ")
+    params = param.split(" ")
+    set_str = params[0]
+    card_name = param.replace(f"{set_str} ", "")
     set_str = parse_set(set_str)
     search_param = f"{text_card_search_url}{card_name}%20"
     request = requests.get(search_param)
