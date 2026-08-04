@@ -1,7 +1,8 @@
 ## get leaders from the limitless tcg API
 
-import requests
 import json
+
+import requests
 
 LEADERS_QUERY = (
     "https://onepiece.limitlesstcg.com/api/dm/search?q=%20category%3Aleader&lang=en"
@@ -28,6 +29,17 @@ def fill_leaders(leaders):
 def scrape():
     leaders = dedupe_leaders(fetch_leaders())
     leaders = fill_leaders(leaders)
+
+    ## OP-17 shim
+    op17_leaders = [
+        {"card_id": "OP17-001", "set": "OP17", "name": "Edward.Newgate"},
+        {"card_id": "OP17-020", "set": "OP17", "name": "Shanks"},
+        {"card_id": "OP17-039", "set": "OP17", "name": "Rocks.D.Xebec"},
+        {"card_id": "OP17-058", "set": "OP17", "name": "Kaido"},
+        {"card_id": "OP17-079", "set": "OP17", "name": "Monkey.D.Luffy"},
+        {"card_id": "OP17-099", "set": "OP17", "name": "Charlotte LinLin"},
+    ]
+    leaders += op17_leaders
     with open("leaders.json", "w") as jsonfile:
         json.dump(leaders, jsonfile, indent=2)
 

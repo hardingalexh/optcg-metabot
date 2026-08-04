@@ -1,7 +1,7 @@
 import base64
 import csv
-import json
 import gzip
+import json
 
 import requests
 
