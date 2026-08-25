@@ -1,13 +1,15 @@
-import os
 import datetime
-
-from dotenv import load_dotenv
-import discord
-import parser
-import matchups as mu
-from marketplace import get_images
-from discord.ext import commands
+import os
 import re
+
+import marketplace
+import matchups as mu
+import meta_report
+import parser
+from discord.ext import commands
+from dotenv import load_dotenv
+
+import discord
 
 # Load environment variables from .env file
 load_dotenv()
@@ -79,12 +81,24 @@ async def matchup(ctx):
 async def market(ctx):
     content = ctx.message.content.replace(f"!{ctx.invoked_with}", "").strip()
     try:
-        images = get_images(content)
+        images = marketplace.get_images(content)
         for file, embed in images:
             await ctx.send(file=file, embed=embed)
     except Exception as e:
         print(e)
         await ctx.send("No cards found. _Did you include a set number?_")
+
+
+@bot.command()
+async def meta(ctx):
+    content = ctx.message.content.replace(f"!{ctx.invoked_with}", "").strip()
+    try:
+        images = meta_report.get_images(content)
+        for file, embed in images:
+            await ctx.send(file=file, embed=embed)
+    except Exception as e:
+        print(e)
+        await ctx.send("No leaders found, or too many leaders found.")
 
 
 # Load Discord token from environment

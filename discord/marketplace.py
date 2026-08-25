@@ -1,10 +1,12 @@
-import requests
-import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter
-import discord
 from datetime import datetime
-from PIL import Image
 from io import BytesIO
+
+import matplotlib.pyplot as plt
+import requests
+from matplotlib.ticker import FuncFormatter
+from PIL import Image
+
+import discord
 
 test_strings = ["09 Roger", "OP16 Galdino", "OP14 Nami", "OP-09 Luffy", "07 Foxy"]
 text_card_search_url = "https://onepiece.limitlesstcg.com/api/dm/search?lang=en&q="
@@ -152,17 +154,22 @@ def format_for_discord(card_id: int, fig: plt) -> tuple[discord.File, discord.Em
     return (file, embed)
 
 
+def get_image_url(card_id):
+    img_url = "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece"
+    set_str = card_id.split("~")[0]
+    set_str = set_str.split("-")[0]
+    card_id_f = f"{card_id.replace('~', '_p').replace('_p0', '')}_EN"
+    card_image_url = f"{img_url}/{set_str}/{card_id_f}.webp"
+    return card_image_url
+
+
 def get_images(param):
     base_cards = get_card_numbers(param)
     images = []
     for x, card_id in enumerate(base_cards):
         limitless_id = get_limitless_id(card_id)
         card_prices = get_prices(limitless_id)
-        img_url = "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece"
-        set_str = card_id.split("~")[0]
-        set_str = set_str.split("-")[0]
-        card_id_f = f"{card_id.replace('~', '_p').replace('_p0', '')}_EN"
-        card_image_url = f"{img_url}/{set_str}/{card_id_f}.webp"
+        card_image_url = get_image_url(card_id)
         card_prices_tcgp = card_prices.get("tcgplayer")
         images.append(
             generate_card_visualization(card_id, card_image_url, card_prices_tcgp)

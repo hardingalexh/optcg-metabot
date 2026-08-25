@@ -27,6 +27,7 @@ def get_file(url: str):
 def parse_matchups(data):
     leader_map = map_leaders()
     output = []
+    meta_report = []
     for leader in data["leaders_presence"]:
         ## data format is a list of leaders, each with a list of subjects
         ## each subject has first and second win/loss counts
@@ -41,11 +42,16 @@ def parse_matchups(data):
             second_total_games = second_wins + second_losses
             first_win_percent = "N/A"
             second_win_percent = "N/A"
+            total_win_percent = "N/A"
             if first_wins and first_losses:
                 first_win_percent = (first_wins / (first_wins + first_losses)) * 100
             if second_wins and second_losses:
                 second_win_percent = (second_wins / (second_wins + second_losses)) * 100
-
+            if first_total_games + second_total_games > 0:
+                total_win_percent = (
+                    (first_wins + second_wins)
+                    / (first_total_games + second_total_games)
+                ) * 100
             leader_obj = find_leader(leader["leader"], leader_map)
             subject_obj = find_leader(subject, leader_map)
 
@@ -61,13 +67,29 @@ def parse_matchups(data):
                     "opponent": subject_name,
                     "opponent_id": subject_obj.get("card_id"),
                     "total_games": first_total_games + second_total_games,
+                    "total_w_pct": total_win_percent,
                     "first_w_pct": first_win_percent,
                     "first_total_games": first_total_games,
                     "second_w_pct": second_win_percent,
                     "second_total_games": second_total_games,
                 }
             )
-    return output
+        meta_report.append(
+            {
+                "leader": leader_name,
+                "leader_id": leader_obj.get("card_id"),
+                "total_games": leader.get("number_of_matches", 0),
+                "wins": leader.get("wins", 0),
+                "losses": leader.get("losses", 0),
+                "total_w_pct": (
+                    leader.get("wins", 0) / leader.get("number_of_matches", 0)
+                )
+                * 100
+                if leader.get("number_of_matches", 0) > 0
+                else "N/A",
+            }
+        )
+    return output, meta_report
 
 
 def map_leaders():
@@ -101,12 +123,17 @@ def scrape():
 
     for key, url in files.items():
         data = get_file(url)
-        output = parse_matchups(data)
+        output, meta_report = parse_matchups(data)
         output = sorted(output, key=lambda x: (x["leader"], x["opponent"]))
+        meta_report = sorted(meta_report, key=lambda x: x["total_games"], reverse=True)
         with open(f"out_{key}.csv", "w") as outfile:
             c = csv.DictWriter(outfile, fieldnames=output[0].keys())
             c.writeheader()
             c.writerows(output)
+        with open(f"meta_{key}.csv", "w") as outfile:
+            c = csv.DictWriter(outfile, fieldnames=meta_report[0].keys())
+            c.writeheader()
+            c.writerows(meta_report)
 
 
 if __name__ == "__main__":
