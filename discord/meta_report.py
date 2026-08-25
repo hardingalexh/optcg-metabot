@@ -91,6 +91,8 @@ def get_images(param):
     images = []
     if param:
         leaders = parser.parse_leader(param)
+        if len(leaders) > 10:
+            raise Exception("too many leaders")
         for leader in leaders:
             leader_id = leader.get("card_id")
             results = fetch_data(leader_id)
