@@ -1,3 +1,4 @@
+import math
 from io import BytesIO
 
 import marketplace
@@ -69,16 +70,13 @@ def build_chart(leaders: pd.DataFrame, leader_id: str = ""):
 
     ax_chart.set_title("Meta Report")
     ax_chart.set_xlabel("Matchup Representation")
-    if not leader_id:
-        ax_chart.set_xlim(left=-1.5, right=2.5)
-        ax_chart.set_ylim(bottom=-15, top=15)
-    else:
-        xmin = leaders["total_games_std"].min() - 0.5
-        xmax = leaders["total_games_std"].max() + 0.5
-        ymin = leaders["total_w_pct"].min() - 5
-        ymax = leaders["total_w_pct"].max() + 5
-        ax_chart.set_xlim(left=xmin, right=xmax)
-        ax_chart.set_ylim(bottom=ymin, top=ymax)
+
+    xmin = math.floor(leaders["total_games_std"].min())
+    xmax = math.ceil(leaders["total_games_std"].max())
+    ymin = leaders["total_w_pct"].min() - 5
+    ymax = leaders["total_w_pct"].max() + 5
+    ax_chart.set_xlim(left=xmin, right=xmax)
+    ax_chart.set_ylim(bottom=ymin, top=ymax)
 
     ax_chart.axhline(y=0)
     ax_chart.axvline(x=0)
