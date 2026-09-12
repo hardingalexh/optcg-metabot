@@ -146,7 +146,7 @@ def format_for_discord(card_id: int, fig: plt) -> tuple[discord.File, discord.Em
         tuple[discord.File, discord.Embed]: file and embed ready for sending
     """
     output_path = f"{card_id}.png"
-    fig.savefig(output_path, bbox_inches="tight", dpi=150)
+    fig.savefig(output_path, bbox_inches="tight", dpi=600)
     plt.close(fig)
     file = discord.File(output_path, filename=f"{card_id}.png")
     embed = discord.Embed()
