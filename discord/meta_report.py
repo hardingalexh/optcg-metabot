@@ -3,11 +3,12 @@ from io import BytesIO
 
 import marketplace
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import parser
 import requests
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
-from PIL import Image
+from PIL import Image, ImageDraw
 
 
 def fetch_data(leader_id: str) -> pd.DataFrame:
@@ -36,6 +37,21 @@ def fetch_data(leader_id: str) -> pd.DataFrame:
     return output
 
 
+def circle_crop_image(image: Image) -> Image:
+
+    image = image.crop((75, 50, 525, 500))
+    height, width = image.size
+    lum_image = Image.new("L", [height, width], 0)
+
+    draw = ImageDraw.Draw(lum_image)
+    draw.pieslice([(0, 0), (height, width)], 0, 360, fill=255, outline="black")
+    image_arr = np.array(image)
+    lum_image_arr = np.array(lum_image)
+    final_image_arr = np.dstack((image_arr, lum_image_arr))
+    return final_image_arr
+    return image
+
+
 def retrieve_image(leader_id: str) -> Image:
     card_image_url = marketplace.get_image_url(leader_id)
     image_response = requests.get(card_image_url)
@@ -61,8 +77,9 @@ def build_chart(leaders: pd.DataFrame, leader_id: str = ""):
         leaders["total_games_std"], leaders["total_w_pct"], leaders["leader_id"]
     ):
         image = retrieve_image(f"{opp_id}~0")
+        image = circle_crop_image(image)
         annotation = AnnotationBbox(
-            OffsetImage(image, zoom=0.05),
+            OffsetImage(image, zoom=0.075),
             (x, y),
             frameon=False,
         )
