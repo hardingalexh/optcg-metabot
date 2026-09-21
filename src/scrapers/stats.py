@@ -40,29 +40,31 @@ def parse_matchups(data):
             ## each subject has first and second win/loss counts
             ## these are not keyed, it's referenced by position in the list
             for subject in leader["subject"]:
+                subject_obj = find_leader(subject, leader_map)
+                subject_name = format_name(subject_obj)
                 pos = leader["subject"].index(subject)
+
                 first_wins = leader["subject_first_wins"][pos]
                 first_losses = leader["subject_first_losses"][pos]
                 first_total_games = first_wins + first_losses
                 second_wins = leader["subject_second_wins"][pos]
                 second_losses = leader["subject_second_losses"][pos]
                 second_total_games = second_wins + second_losses
-                first_win_percent = "N/A"
-                second_win_percent = "N/A"
-                total_win_percent = "N/A"
-                if first_wins and first_losses:
+                first_win_percent = 0
+                second_win_percent = 0
+                total_win_percent = 0
+                if (first_wins + first_losses) > 0:
                     first_win_percent = (first_wins / (first_wins + first_losses)) * 100
-                if second_wins and second_losses:
+                if (second_wins + second_losses) > 0:
                     second_win_percent = (
                         second_wins / (second_wins + second_losses)
                     ) * 100
-                if first_total_games + second_total_games > 0:
+                if (first_total_games + second_total_games) > 0:
                     total_win_percent = (
                         (first_wins + second_wins)
                         / (first_total_games + second_total_games)
                     ) * 100
-                subject_obj = find_leader(subject, leader_map)
-                subject_name = format_name(subject_obj)
+
                 if leader_obj and subject_obj:
                     output.append(
                         {
