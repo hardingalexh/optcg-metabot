@@ -5,3 +5,4 @@
 *.pyc
 .env
 *.png
+src/optcg_metabot.egg-info

@@ -1,12 +1,12 @@
-FROM python:3.13
+FROM python:3.14
+
+COPY --from=ghcr.io/astral-sh/uv:0.12.17 /uv /uvx /bin/
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
 COPY . .
-COPY .env .env
+
+RUN uv sync --locked
 
 RUN chmod +x ./run.sh
 
