@@ -28,12 +28,13 @@ def fetch_data(leader_id: str) -> pd.DataFrame:
         output = output.rename(columns=mapper)
     else:
         output = pd.read_csv("meta_all.csv")
-    output = output.dropna().sort_values("total_games", ascending=False)[0:20]
+    output = output.dropna(subset=["total_games", "total_w_pct"]).sort_values(
+        "total_games", ascending=False
+    )[0:20]
     output["total_games_std"] = (
         output["total_games"] - output["total_games"].mean()
     ) / output["total_games"].std()
     output["total_w_pct"] = output["total_w_pct"] - 50
-
     return output
 
 
@@ -92,6 +93,7 @@ def build_chart(leaders: pd.DataFrame, leader_id: str = ""):
     xmax = math.ceil(leaders["total_games_std"].max())
     ymin = leaders["total_w_pct"].min() - 5
     ymax = leaders["total_w_pct"].max() + 5
+    print(leaders, xmin, xmax, ymin, ymax)
     ax_chart.set_xlim(left=xmin, right=xmax)
     ax_chart.set_ylim(bottom=ymin, top=ymax)
 
