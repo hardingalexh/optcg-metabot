@@ -93,7 +93,7 @@ def parse_matchups(data):
 
 
 def map_leaders():
-    with open("leaders.json", "r") as f:
+    with open("data/leaders.json", "r") as f:
         lookup = json.load(f)
     return lookup
 
@@ -126,11 +126,11 @@ def scrape():
         output, meta_report = parse_matchups(data)
         output = sorted(output, key=lambda x: (x["leader"], x["opponent"]))
         meta_report = sorted(meta_report, key=lambda x: x["total_games"], reverse=True)
-        with open(f"out_{key}.csv", "w") as outfile:
+        with open(f"data/out_{key}.csv", "w") as outfile:
             c = csv.DictWriter(outfile, fieldnames=output[0].keys())
             c.writeheader()
             c.writerows(output)
-        with open(f"meta_{key}.csv", "w") as outfile:
+        with open(f"data/meta_{key}.csv", "w") as outfile:
             c = csv.DictWriter(outfile, fieldnames=meta_report[0].keys())
             c.writeheader()
             c.writerows(meta_report)

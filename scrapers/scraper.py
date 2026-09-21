@@ -1,12 +1,13 @@
-import schedule
 import time
 from pathlib import Path
+
 import leaders
+import schedule
 import stats
 
 
-def remove_root_png_files():
-    for png_file in Path("/app/").glob("*.png"):
+def remove_tmp_png_files():
+    for png_file in Path("/app/tmp/").glob("*.png"):
         try:
             png_file.unlink()
         except OSError:
@@ -14,7 +15,7 @@ def remove_root_png_files():
 
 
 def job():
-    remove_root_png_files()
+    remove_tmp_png_files()
     leaders.scrape()
     stats.scrape()
 
