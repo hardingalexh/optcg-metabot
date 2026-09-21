@@ -2,7 +2,7 @@ import json
 
 
 def retrieve_leaders():
-    with open("leaders.json", "r") as jsonfile:
+    with open("data/leaders.json", "r") as jsonfile:
         leaders = json.load(jsonfile)
     return leaders
 
@@ -19,10 +19,10 @@ def as_color(token: str) -> list[str] | bool:
     token = token.lower()
     if len(token) == 0:
         return False
-    if len(token) == 1 and token in color_map.keys():
+    if len(token) == 1 and token in color_map:
         ## case 1: single color abbreviation
         return [color_map[token]]
-    elif len(token) == 2 and all(char in color_map.keys() for char in token):
+    elif len(token) == 2 and all(char in color_map for char in token):
         ## case 2: multi color abbreviation
         return [color_map[char] for char in token]
     elif all(char in color_map.values() for char in token.split("/")):

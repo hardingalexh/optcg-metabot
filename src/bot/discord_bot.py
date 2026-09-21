@@ -2,14 +2,12 @@ import datetime
 import os
 import re
 
-import marketplace
-import matchups as mu
-import meta_report
-import parser
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-import discord
+from bot import marketplace, meta_report, parser
+from bot import matchups as mu
 
 # Load environment variables from .env file
 load_dotenv()

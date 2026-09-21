@@ -1,0 +1,1 @@
+"""OPTCG Metabot package."""

@@ -1,14 +1,13 @@
 import math
-from io import BytesIO
 
-import marketplace
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import parser
-import requests
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from PIL import Image, ImageDraw
+
+from bot import parser
+from utils import *
 
 
 def fetch_data(leader_id: str) -> pd.DataFrame:
@@ -21,13 +20,13 @@ def fetch_data(leader_id: str) -> pd.DataFrame:
         pd.DataFrame: top 20 matches by games played
     """
     if leader_id:
-        output = pd.read_csv("out_all.csv")
+        output = pd.read_csv("data/out_all.csv")
         output = output[output["leader_id"] == leader_id]
         # rename leader ID to the opponent ID
         mapper = {"leader_id": "source_leader_id", "opponent_id": "leader_id"}
         output = output.rename(columns=mapper)
     else:
-        output = pd.read_csv("meta_all.csv")
+        output = pd.read_csv("data/meta_all.csv")
     output = output.dropna(subset=["total_games", "total_w_pct"]).sort_values(
         "total_games", ascending=False
     )[0:20]
@@ -39,27 +38,18 @@ def fetch_data(leader_id: str) -> pd.DataFrame:
 
 
 def circle_crop_image(image: Image) -> Image:
+    box = (75, 50, 525, 500)
+    cropped = image.crop(box)
 
-    image = image.crop((75, 50, 525, 500))
-    height, width = image.size
+    height, width = cropped.size
     lum_image = Image.new("L", [height, width], 0)
 
     draw = ImageDraw.Draw(lum_image)
     draw.pieslice([(0, 0), (height, width)], 0, 360, fill=255, outline="black")
-    image_arr = np.array(image)
+    image_arr = np.array(cropped)
     lum_image_arr = np.array(lum_image)
     final_image_arr = np.dstack((image_arr, lum_image_arr))
     return final_image_arr
-    return image
-
-
-def retrieve_image(leader_id: str) -> Image:
-    card_image_url = marketplace.get_image_url(leader_id)
-    image_response = requests.get(card_image_url)
-    if not image_response.ok:
-        image_response = requests.get(card_image_url.replace("EN", "JP"))
-    image = Image.open(BytesIO(image_response.content)).convert("RGB")
-    return image
 
 
 def build_chart(leaders: pd.DataFrame, leader_id: str = ""):
@@ -67,7 +57,7 @@ def build_chart(leaders: pd.DataFrame, leader_id: str = ""):
         fig = plt.figure(figsize=(12, 4), constrained_layout=True)
         ax_image = fig.add_axes([0.02, 0.05, 0.28, 0.9])
         ax_chart = fig.add_axes([0.38, 0.1, 0.58, 0.8])
-        image = retrieve_image(leader_id)
+        image = retrieve_leader_image(leader_id)
         ax_image.imshow(image)
         ax_image.axis("off")
     else:
@@ -77,7 +67,7 @@ def build_chart(leaders: pd.DataFrame, leader_id: str = ""):
     for x, y, opp_id in zip(
         leaders["total_games_std"], leaders["total_w_pct"], leaders["leader_id"]
     ):
-        image = retrieve_image(f"{opp_id}~0")
+        image = retrieve_leader_image(f"{opp_id}")
         image = circle_crop_image(image)
         annotation = AnnotationBbox(
             OffsetImage(image, zoom=0.075),
@@ -88,12 +78,10 @@ def build_chart(leaders: pd.DataFrame, leader_id: str = ""):
 
     ax_chart.set_title("Meta Report")
     ax_chart.set_xlabel("Matchup Representation")
-
     xmin = math.floor(leaders["total_games_std"].min())
     xmax = math.ceil(leaders["total_games_std"].max())
     ymin = leaders["total_w_pct"].min() - 5
     ymax = leaders["total_w_pct"].max() + 5
-    print(leaders, xmin, xmax, ymin, ymax)
     ax_chart.set_xlim(left=xmin, right=xmax)
     ax_chart.set_ylim(bottom=ymin, top=ymax)
 
@@ -113,10 +101,11 @@ def get_images(param):
         for leader in leaders:
             leader_id = leader.get("card_id")
             results = fetch_data(leader_id)
-            fig = build_chart(results, leader_id)
-            images.append(marketplace.format_for_discord(leader_id, fig))
+            if len(results) > 0:
+                fig = build_chart(results, leader_id)
+                images.append(format_for_discord(leader_id, fig))
     else:
         results = fetch_data(None)
         fig = build_chart(results, None)
-        images.append(marketplace.format_for_discord("meta", fig))
+        images.append(format_for_discord("meta", fig))
     return images

@@ -1,9 +1,9 @@
 import time
 from pathlib import Path
 
-import leaders
 import schedule
-import stats
+
+from scrapers import leaders, stats
 
 
 def remove_tmp_png_files():

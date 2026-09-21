@@ -8,14 +8,14 @@ The data scraper(s) are located in the `/data` directory, and pull leaders from 
 
 ## Discord bot
 
-The Discord bot is located in the `/discord` directory.
+The Discord bot is located in `src/bot`.
 
 ## Dev Setup
 
 1. Create an env file based on the example provided, and provide a discord app token.
 2. Install dependencies as listed in the requirements.txt file
-3. Run `python data/scraper.py` to run the scraper, which will run the leaders/data scraper.
-4. Run `python discord/discord_bot.py` to run the discord bot
+3. Run `uv run python -m scrapers.scraper` to run the scraper.
+4. Run `uv run python -m bot.discord_bot` to run the Discord bot.
 
 ## Deployment
 

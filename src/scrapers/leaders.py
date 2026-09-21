@@ -4,6 +4,8 @@ import json
 
 import requests
 
+from utils import retrieve_leader_image
+
 LEADERS_QUERY = (
     "https://onepiece.limitlesstcg.com/api/dm/search?q=%20category%3Aleader&lang=en"
 )
@@ -26,9 +28,15 @@ def fill_leaders(leaders):
     return out
 
 
+def fetch_leader_images(leaders):
+    for leader in leaders:
+        retrieve_leader_image(leader.get("card_id"))
+
+
 def scrape():
     leaders = dedupe_leaders(fetch_leaders())
     leaders = fill_leaders(leaders)
+    fetch_leader_images(leaders)
 
     with open("data/leaders.json", "w") as jsonfile:
         json.dump(leaders, jsonfile, indent=2)

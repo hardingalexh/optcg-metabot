@@ -1,9 +1,10 @@
 import csv
+
 import discord
 
 
 def load_matchup_data(prefix: str = "all") -> list[dict]:
-    with open(f"out_{prefix}.csv", "r") as csvfile:
+    with open(f"data/out_{prefix}.csv", "r") as csvfile:
         reader = csv.DictReader(csvfile)
         return list(reader)
 
