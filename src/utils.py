@@ -20,10 +20,9 @@ def parse_set(set_str: str) -> str:
     """
     ## accepted formats are OP01, 01, OP-01
     set_str = set_str.replace("-", "")
+    ## for shorthand, ie changing 02 to OP02
     if len(set_str) == 2:
         set_str = f"OP{set_str}"
-    if len(set_str) != 4:
-        raise Exception("Invalid Set Type")
     return set_str.upper()
 
 
