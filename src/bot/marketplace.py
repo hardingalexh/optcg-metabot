@@ -9,7 +9,17 @@ from PIL import Image
 
 from utils import *
 
-test_strings = ["09 Roger", "OP16 Galdino", "OP14 Nami", "OP-09 Luffy", "07 Foxy"]
+test_strings = [
+    "09 Roger",
+    "OP16 Galdino",
+    "OP14 Nami",
+    "OP-09 Luffy",
+    "07 Foxy",
+    "PRB02 Moria",
+    "PRB-02 Koby",
+    "EB01 Chopper",
+    "EB-01 Chopper",
+]
 
 
 def get_prices(card: str) -> list[list[int, int]]:
@@ -91,3 +101,17 @@ def get_images(param):
             generate_card_visualization(card_id, card_image_url, card_prices_tcgp)
         )
     return images
+
+
+def test():
+    try:
+        for card in test_strings:
+            get_images(card)
+            print(f"Successfully generated {card}")
+    except Exception as e:
+        print(f"Failed to parse for {card}")
+        print(e)
+
+
+if __name__ == "__main__":
+    test()
