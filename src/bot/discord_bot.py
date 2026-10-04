@@ -21,6 +21,23 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 TOURNAMENT_MODE = False
 
 
+def get_prefix(content: str) -> tuple[str, str]:
+    """For a given input string, remove the dataset prefix in parentheses and return the sanitized string and prefix separately
+
+    Args:
+        content (str): The input string
+
+    Returns:
+        tuple[str, str]: The sanitized input plus the prefix
+    """
+    prefix = "all"
+    match = re.search(r"\((.*?)\)", content)
+    if match:
+        prefix = match.group(1)
+        content = re.sub(r"\(.*?\)", "", content).strip()
+    return content, prefix
+
+
 async def command_func(ctx):
     """parses the matchup command
 
@@ -32,11 +49,7 @@ async def command_func(ctx):
     )
     if not TOURNAMENT_MODE:
         content = ctx.message.content.replace(f"!{ctx.invoked_with}", "").strip()
-        prefix = "all"
-        match = re.search(r"\((.*?)\)", content)
-        if match:
-            prefix = match.group(1)
-            content = re.sub(r"\(.*?\)", "", content).strip()
+        content, prefix = get_prefix(content)
         leaders = content.split(",")
         parsed_leaders = parser.parse_leader(leaders[0].strip())
         if len(leaders) > 1:
@@ -90,8 +103,9 @@ async def market(ctx):
 @bot.command()
 async def meta(ctx):
     content = ctx.message.content.replace(f"!{ctx.invoked_with}", "").strip()
+    content, prefix = get_prefix(content)
     try:
-        images = meta_report.get_images(content)
+        images = meta_report.get_images(content, prefix)
         for file, embed in images:
             await ctx.send(file=file, embed=embed)
     except Exception as e:

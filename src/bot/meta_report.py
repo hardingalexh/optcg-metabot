@@ -1,3 +1,4 @@
+import datetime
 import math
 
 import matplotlib.pyplot as plt
@@ -10,23 +11,24 @@ from bot import parser
 from utils import *
 
 
-def fetch_data(leader_id: str) -> pd.DataFrame:
+def fetch_data(leader_id: str, prefix: str = "all") -> pd.DataFrame:
     """fetches the data for the meta report, reformatting leader data to look like meta data
 
     Args:
         leader (str): leader ID
+        prefix (str): the dataset prefix
 
     Returns:
         pd.DataFrame: top 20 matches by games played
     """
     if leader_id:
-        output = pd.read_csv("data/out_all.csv")
+        output = pd.read_csv(f"data/out_{prefix}.csv")
         output = output[output["leader_id"] == leader_id]
         # rename leader ID to the opponent ID
         mapper = {"leader_id": "source_leader_id", "opponent_id": "leader_id"}
         output = output.rename(columns=mapper)
     else:
-        output = pd.read_csv("data/meta_all.csv")
+        output = pd.read_csv(f"data/meta_{prefix}.csv")
     output = output.dropna(subset=["total_games", "total_w_pct"]).sort_values(
         "total_games", ascending=False
     )[0:20]
@@ -38,6 +40,14 @@ def fetch_data(leader_id: str) -> pd.DataFrame:
 
 
 def circle_crop_image(image: Image) -> Image:
+    """For a given image, crop a circle roughly positioned to the character art
+
+    Args:
+        image (Image): the image content
+
+    Returns:
+        Image: the cropped image
+    """
     box = (75, 50, 525, 500)
     cropped = image.crop(box)
 
@@ -52,7 +62,16 @@ def circle_crop_image(image: Image) -> Image:
     return final_image_arr
 
 
-def build_chart(leaders: pd.DataFrame, leader_id: str = ""):
+def build_chart(leaders: pd.DataFrame, leader_id: str, prefix: str) -> plt:
+    """Builds the meta chart and returns the figure
+
+    Args:
+        leaders (pd.DataFrame): The leader matchup data
+        leader_id (str, optional): The leader id, if left blank does the whole meta. Defaults to "".
+
+    Returns:
+        plt.figure: matplotlib figure
+    """
     if leader_id:
         fig = plt.figure(figsize=(12, 4), constrained_layout=True)
         ax_image = fig.add_axes([0.02, 0.05, 0.28, 0.9])
@@ -75,8 +94,8 @@ def build_chart(leaders: pd.DataFrame, leader_id: str = ""):
             frameon=False,
         )
         ax_chart.add_artist(annotation)
-
-    ax_chart.set_title("Meta Report")
+    today = datetime.datetime.now()
+    ax_chart.set_title(f"{prefix.title()} Meta Report ({today.strftime('%d/%m/%Y')})")
     ax_chart.set_xlabel("Matchup Representation")
     xmin = math.floor(leaders["total_games_std"].min())
     xmax = math.ceil(leaders["total_games_std"].max())
@@ -92,7 +111,19 @@ def build_chart(leaders: pd.DataFrame, leader_id: str = ""):
     return fig
 
 
-def get_images(param):
+def get_images(param: str, prefix: str = "all") -> list[Image]:
+    """For a given discord input, return the charts for all leaders
+
+    Args:
+        param (str): the leader string
+        prefix (str, optional): The dataset prefix. Defaults to "all".
+
+    Raises:
+        Exception: Too many leaders
+
+    Returns:
+        list: images in a list
+    """
     images = []
     if param:
         leaders = parser.parse_leader(param)
@@ -100,12 +131,13 @@ def get_images(param):
             raise Exception("too many leaders")
         for leader in leaders:
             leader_id = leader.get("card_id")
-            results = fetch_data(leader_id)
+            results = fetch_data(leader_id, prefix)
+
             if len(results) > 0:
-                fig = build_chart(results, leader_id)
+                fig = build_chart(results, leader_id, prefix)
                 images.append(format_for_discord(leader_id, fig))
     else:
-        results = fetch_data(None)
-        fig = build_chart(results, None)
+        results = fetch_data(None, prefix)
+        fig = build_chart(results, None, prefix)
         images.append(format_for_discord("meta", fig))
     return images
