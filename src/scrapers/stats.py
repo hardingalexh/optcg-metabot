@@ -126,8 +126,8 @@ def find_leader(leader, leaders):
 def scrape():
     files = {
         "all": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_lw.json",
-        "1b": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_LWW1BillionBounty.json",
-        "2b": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_LWW2BillionBounty.json",
+        "1b": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_LWS1BillionBounty.json",
+        "2b": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_LWS2BillionBounty.json",
         "eastern": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_lw_eastern.json",
         "special": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_Special_Queue.json",
     }
