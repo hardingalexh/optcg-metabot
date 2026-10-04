@@ -95,7 +95,7 @@ def build_chart(leaders: pd.DataFrame, leader_id: str, prefix: str) -> plt:
         )
         ax_chart.add_artist(annotation)
     today = datetime.datetime.now()
-    ax_chart.set_title(f"{prefix.title()} Meta Report ({today.strftime('%d/%m/%Y')})")
+    ax_chart.set_title(f"{prefix.title()} Meta Report ({today.strftime('%m/%d/%Y')})")
     ax_chart.set_xlabel("Matchup Representation")
     xmin = math.floor(leaders["total_games_std"].min())
     xmax = math.ceil(leaders["total_games_std"].max())
