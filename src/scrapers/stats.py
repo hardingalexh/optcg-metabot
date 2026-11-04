@@ -131,25 +131,37 @@ def scrape():
         "eastern": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_lw_eastern.json",
         "special": "https://opbountypck.s3.amazonaws.com/stats/regular/Stats_Special_Queue.json",
     }
-    for set in range(8, 16):
+    ## OP sets
+    for set in range(8, 17):
         set_filled = str(set).zfill(2)
         files[f"OP{set_filled}"] = (
             f"https://opbountypck.s3.amazonaws.com/stats/regular/Stats_OP{set_filled}.json"
         )
+    ## EB sets
+    for eb_set in range(1, 5):
+        set_filled = str(eb_set).zfill(2)
+        files[f"EB{set_filled}"] = (
+            f"https://opbountypck.s3.amazonaws.com/stats/regular/Stats_EB{set_filled}.json"
+        )
 
     for key, url in files.items():
-        data = get_file(url)
-        output, meta_report = parse_matchups(data)
-        output = sorted(output, key=lambda x: (x["leader"], x["opponent"]))
-        meta_report = sorted(meta_report, key=lambda x: x["total_games"], reverse=True)
-        with open(f"data/out_{key}.csv", "w") as outfile:
-            c = csv.DictWriter(outfile, fieldnames=output[0].keys())
-            c.writeheader()
-            c.writerows(output)
-        with open(f"data/meta_{key}.csv", "w") as outfile:
-            c = csv.DictWriter(outfile, fieldnames=meta_report[0].keys())
-            c.writeheader()
-            c.writerows(meta_report)
+        try:
+            data = get_file(url)
+            output, meta_report = parse_matchups(data)
+            output = sorted(output, key=lambda x: (x["leader"], x["opponent"]))
+            meta_report = sorted(
+                meta_report, key=lambda x: x["total_games"], reverse=True
+            )
+            with open(f"data/out_{key}.csv", "w") as outfile:
+                c = csv.DictWriter(outfile, fieldnames=output[0].keys())
+                c.writeheader()
+                c.writerows(output)
+            with open(f"data/meta_{key}.csv", "w") as outfile:
+                c = csv.DictWriter(outfile, fieldnames=meta_report[0].keys())
+                c.writeheader()
+                c.writerows(meta_report)
+        except Exception:
+            print(f"Failed to retrieve {key}")
 
 
 if __name__ == "__main__":
