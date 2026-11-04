@@ -120,29 +120,49 @@ def draw_health_gauge(ax: plt.Axes, health: dict) -> None:
     ax.add_patch(Circle((0, 0), 0.06, facecolor=INK_PRIMARY, zorder=4))
 
     ax.text(
-        0, 1.38, "Meta Health", ha="center", fontsize=11, weight="bold",
+        0,
+        1.38,
+        "Meta Health",
+        ha="center",
+        fontsize=11,
+        weight="bold",
         color=INK_PRIMARY,
     )
     ax.text(
-        0, -0.32, f"{health['index']:.0%}", ha="center", va="center",
-        fontsize=22, weight="bold", color=INK_PRIMARY,
+        0,
+        -0.32,
+        f"{health['index']:.0%}",
+        ha="center",
+        va="center",
+        fontsize=22,
+        weight="bold",
+        color=INK_PRIMARY,
     )
     # band label in ink, with a color swatch carrying the band identity
     ax.add_patch(Circle((-0.42, -0.62), 0.05, facecolor=health["color"]))
     ax.text(
-        -0.32, -0.62, health["label"], ha="left", va="center", fontsize=11,
+        -0.32,
+        -0.62,
+        health["label"],
+        ha="left",
+        va="center",
+        fontsize=11,
         color=INK_PRIMARY,
     )
     ax.text(
-        0, -0.92,
-        f"Chance your next {HEALTH_GAMES} opponents\nare all different leaders",
-        ha="center", va="center", fontsize=7.5, color=INK_SECONDARY,
+        0,
+        -0.92,
+        f"Chance your next {HEALTH_GAMES} matchups\nare all different leaders",
+        ha="center",
+        va="center",
+        fontsize=7.5,
+        color=INK_SECONDARY,
     )
-    ax.text(
-        0, -1.2,
-        f"Plays like ~{health['effective_leaders']:.0f} evenly played leaders",
-        ha="center", va="center", fontsize=7.5, color=INK_SECONDARY,
-    )
+    # ax.text(
+    #     0, -1.2,
+    #     f"Plays like ~{health['effective_leaders']:.0f} evenly played leaders",
+    #     ha="center", va="center", fontsize=7.5, color=INK_SECONDARY,
+    # )
 
     ax.set_xlim(-1.3, 1.3)
     ax.set_ylim(-1.35, 1.55)
